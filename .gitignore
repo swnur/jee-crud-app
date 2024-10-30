@@ -56,6 +56,3 @@ target/surefire-reports/
 ### Visual Studio Code ###
 .vscode/
 
-# Ignore static CSS and JS directories
-static/css/
-static/js/
