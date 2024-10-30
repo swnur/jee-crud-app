@@ -34,14 +34,25 @@
                         <th>Last Name</th>
                         <th>Email</th>
                         <th>Address</th>
+                        <th>Action</th>
                     </tr>
 
                     <c:forEach var="student" items="${studentList}">
+
+                        <!-- set up a link for each student -->
+                        <c:url var="tempLink" value="student">
+                            <c:param name="command" value="LOAD" />
+                            <c:param name="studentId" value="${student.id}" />
+                        </c:url>
+
                         <tr>
                             <td>${student.firstName}</td>
                             <td>${student.lastName}</td>
                             <td>${student.email}</td>
                             <td>${student.address}</td>
+                            <td>
+                                <a href="${tempLink}">Update</a>
+                            </td>
                         </tr>
                     </c:forEach>
                 </table>

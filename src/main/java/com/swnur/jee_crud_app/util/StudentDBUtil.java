@@ -3,10 +3,7 @@ package com.swnur.jee_crud_app.util;
 import com.swnur.jee_crud_app.model.Student;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +55,57 @@ public class StudentDBUtil {
             int statementResult = preparedStatement.executeUpdate();
             return statementResult == 1;
         } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Student getStudentById(int id) {
+        String sqlQuery = "SELECT * FROM student WHERE id=?;";
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+            preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Student student = new Student();
+
+            while (resultSet.next()) {
+                student.setFirstName(resultSet.getString("first_name"));
+                student.setLastName(resultSet.getString("last_name"));
+                student.setEmail(resultSet.getString("email"));
+                student.setAddress(resultSet.getString("address"));
+            }
+
+            return student;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean updateStudent(Student student) {
+        String sqlQuery = "UPDATE student\n" +
+                "SET first_name=?,\n" +
+                "    last_name=?,\n" +
+                "    email=?,\n" +
+                "    address=?\n" +
+                "WHERE id=?;";
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+            preparedStatement.setString(1, student.getFirstName());
+            preparedStatement.setString(2, student.getLastName());
+            preparedStatement.setString(3, student.getEmail());
+            preparedStatement.setString(4, student.getAddress());
+            preparedStatement.setInt(5, student.getId());
+
+
+            int result = preparedStatement.executeUpdate();
+            return result == 1;
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
