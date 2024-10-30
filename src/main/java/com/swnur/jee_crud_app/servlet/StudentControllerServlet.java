@@ -1,7 +1,7 @@
 package com.swnur.jee_crud_app.servlet;
 
 import com.swnur.jee_crud_app.model.Student;
-import com.swnur.jee_crud_app.util.StudentDBUtil;
+import com.swnur.jee_crud_app.service.StudentService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -14,11 +14,13 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/student")
 public class StudentControllerServlet extends HttpServlet {
-    private StudentDBUtil studentDBUtil;
+    private StudentService service;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -28,7 +30,7 @@ public class StudentControllerServlet extends HttpServlet {
             InitialContext initialContext = new InitialContext();
             DataSource dataSource = (DataSource) initialContext.lookup("java:comp/env/jdbc/web_student_tracker");
 
-            studentDBUtil = new StudentDBUtil(dataSource);
+            service = new StudentService(dataSource);
         } catch (NamingException e) {
             e.printStackTrace();
             throw new ServletException("Failed to retrieve DataSource", e);
@@ -37,35 +39,19 @@ public class StudentControllerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String command = Optional.ofNullable(req.getParameter("command")).orElse("LIST");
+
         try {
-            String command = req.getParameter("command");
-
-            if (command == null) {
-                command = "LIST";
-            }
-
             switch(command) {
-                case "ADD":
-                    addStudent(req, resp);
-                    break;
-                case "DELETE":
-                    deleteStudent(req, resp);
-                    break;
-                case "UPDATE":
-                    updateStudent(req, resp);
-                    break;
-                case "LIST":
-                    listStudents(req, resp);
-                    break;
-                case "LOAD":
-                    loadStudent(req, resp);
-                    break;
-                default:
-                    listStudents(req, resp);
+                case "ADD" -> addStudent(req, resp);
+                case "DELETE" -> deleteStudent(req, resp);
+                case "UPDATE" -> updateStudent(req, resp);
+                case "LIST" -> listStudents(req, resp);
+                case "LOAD" -> loadStudent(req, resp);
+                default -> listStudents(req, resp);
             }
-
         } catch (Exception e) {
-            throw new ServletException(e);
+            handleException(req, resp, e);
         }
     }
 
@@ -74,65 +60,77 @@ public class StudentControllerServlet extends HttpServlet {
         doGet(req, resp);
     }
 
-    private void listStudents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Student> students = studentDBUtil.getAllStudents();
+    private void addStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        Student newStudent = extractStudentFromRequest(request);
+        boolean result = service.addStudent(newStudent);
+
+        // TODO: Log the status
+        redirectToList(response);
+    }
+
+    private void deleteStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        int studentId = Integer.parseInt(request.getParameter("studentId"));
+
+        boolean result = service.deleteStudent(studentId);
+
+        System.out.println("Delete student result -> " + result);
+        redirectToList(response);
+    }
+
+    private void updateStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        Student updatedStudent = extractStudentFromRequest(request);
+        updatedStudent.setId(Integer.parseInt(request.getParameter("studentId")));
+
+        System.out.println("updateStudent() function, student data from request\n" + updatedStudent);
+
+        boolean result = service.updateStudent(updatedStudent);
+        System.out.println("Update student result -> " + result);
+
+        redirectToList(response);
+    }
+
+    private void listStudents(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        List<Student> students = service.getAllStudents();
 
         request.setAttribute("studentList", students);
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/list-students.jsp");
-        requestDispatcher.forward(request, response);
+        forwardToPage(request, response, "/list-students.jsp");
     }
 
-    private void addStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String email = request.getParameter("email");
-        String address = request.getParameter("address");
-
-        Student newStudent = new Student(firstName, lastName, email, address);
-
-        boolean result = studentDBUtil.addStudent(newStudent);
-
-        System.out.println("Add student result -> " + result);
-        listStudents(request, response);
-    }
-
-    private void loadStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Read student id from form data
+    private void loadStudent(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
         int studentId = Integer.parseInt(request.getParameter("studentId"));
 
-        // 2. get student from database (db util)
-        Student currentStudent = studentDBUtil.getStudentById(studentId);
+        Student currentStudent = service.getStudent(studentId);
 
-        // 3. place student in the request attribute
         request.setAttribute("studentData", currentStudent);
-        // 4. send to jsp page: update-student-form.jsp
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/WEB-INF/JSP/update-student-form.jsp");
-        requestDispatcher.forward(request, response);
+        forwardToPage(request, response, "/WEB-INF/JSP/update-student-form.jsp");
     }
 
-    private void updateStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("studentId"));
+    private Student extractStudentFromRequest(HttpServletRequest request) {
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
-
-        Student tempStudent = new Student(id, firstName, lastName, email, address);
-        System.out.println("updateStudent() function, student data from request\n" + tempStudent);
-
-        boolean result = studentDBUtil.updateStudent(tempStudent);
-
-        System.out.println("Update student result -> " + result);
-        listStudents(request, response);
+        return new Student(firstName, lastName, email, address);
     }
 
-    private void deleteStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int studentId = Integer.parseInt(request.getParameter("studentId"));
+    private void redirectToList(HttpServletResponse response) throws IOException {
+        response.sendRedirect("student?command=LIST");
+    }
 
-        boolean result = studentDBUtil.deleteStudent(studentId);
+    private void forwardToPage(HttpServletRequest request, HttpServletResponse response, String page) throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher(page);
+        dispatcher.forward(request, response);
+    }
 
-        System.out.println("Delete student result -> " + result);
-        listStudents(request, response);
+    private void handleException(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+        e.printStackTrace();
+        request.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
+        forwardToPage(request, response, "/WEB-INF/error.jsp");
     }
 }
