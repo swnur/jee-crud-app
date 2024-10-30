@@ -1,90 +1,160 @@
-/* Centered Wrapper */
-#wrapper {
-    width: 90%;
-    max-width: 1200px;
-    margin: 20px auto;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
-}
+/* style.css */
 
-/* Header */
-#header {
-    background-color: #2c3e50;
-    color: #ffffff;
-    padding: 20px;
-    border-radius: 10px 10px 0 0;
-}
-
-#header h2 {
-    font-size: 28px;
-    font-weight: bold;
+/* Reset some basic styles */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-/* Container for table content */
+/* Center align the wrapper for header and container */
+#wrapper {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-bottom: 2px solid #dedede;
+    text-align: center;
+}
+
+/* Header style */
+#header h2 {
+    font-size: 1.8em;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Main container for content, centered */
 #container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* Content section padding */
+#content {
     padding: 20px;
 }
 
-/* Add Student Button */
-.add-student-button {
-    display: inline-block;
-    background-color: #1abc9c;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-bottom: 20px;
-    text-align: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.add-student-button:hover {
-    background-color: #16a085;
-}
-
-/* Table Styling */
+/* Table styling */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px auto;
-    font-size: 16px;
-    background-color: #ffffff;
+    margin-top: 20px;
+    font-size: 1em;
 }
 
-th, td {
-    padding: 12px;
-    text-align: center;
-}
-
-th {
+/* Table header styling */
+table th {
     background-color: #3498db;
     color: #ffffff;
-    font-weight: 600;
+    padding: 12px;
+    font-weight: normal;
+    text-align: left;
 }
 
-td {
+/* Table row styling */
+table td {
+    padding: 12px;
     color: #333333;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #dddddd;
 }
 
-/* Row coloring and hover effect */
-tr:nth-child(even) {
-    background-color: #f7f9fb;
+/* Row hover effect */
+table tr:hover {
+    background-color: #f2f2f2;
 }
 
-tr:nth-child(odd) {
-    background-color: #eef3f7;
+/* Links in the table */
+a {
+    color: #3498db;
+    text-decoration: none;
 }
 
-tr:hover {
-    background-color: #d0e6f2;
+a:hover {
+    text-decoration: underline;
+}
+
+/* Delete link specific style */
+.delete-link {
+    color: #e74c3c;
+}
+
+.delete-link:hover {
+    color: #c0392b;
+}
+
+/* Button styling */
+.add-student-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.add-student-button:hover {
+    background-color: #27ae60;
+}
+
+/* Modal background */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
+
+/* Modal content */
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Style buttons */
+.modal-content button {
+    padding: 10px 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-content button:first-child {
+    background-color: #d9534f; /* Delete button color */
+    color: white;
+}
+
+.modal-content button:last-child {
+    background-color: #5bc0de; /* Cancel button color */
+    color: white;
+}
+
+.delete-link {
+    color: #d9534f;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.delete-link:hover {
+    text-decoration: underline;
 }

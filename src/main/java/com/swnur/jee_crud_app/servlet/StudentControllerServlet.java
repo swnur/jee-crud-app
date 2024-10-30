@@ -107,7 +107,7 @@ public class StudentControllerServlet extends HttpServlet {
         // 3. place student in the request attribute
         request.setAttribute("studentData", currentStudent);
         // 4. send to jsp page: update-student-form.jsp
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("update-student-form.jsp");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/WEB-INF/JSP/update-student-form.jsp");
         requestDispatcher.forward(request, response);
     }
 

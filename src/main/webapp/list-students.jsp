@@ -11,9 +11,7 @@
 <html>
     <head>
         <title>Student Tracker App</title>
-
         <link type="text/css" rel="stylesheet" href="static/css/style.css">
-        <link type="text/css" rel="stylesheet" href="static/css/modal.css">
     </head>
     <body>
         <div id="wrapper">
@@ -54,12 +52,13 @@
                             <td>${student.email}</td>
                             <td>${student.address}</td>
                             <td>
-                                <a href="${tempLink}">Update</a>
+                                <a href="${tempLink}" class="btn-update">Update</a>
                                 |
                                 <a href="${deleteLink}" class="delete-link"
                                    onclick="openDeleteModal(event, '${deleteLink}')">
                                     Delete
                                 </a>
+
                             </td>
                         </tr>
                     </c:forEach>
@@ -70,7 +69,7 @@
                        class="add-student-button" />
             </div>
         </div>
-
+        <!-- Delete Confirmation Modal -->
         <div id="deleteModal" class="modal">
             <div class="modal-content">
                 <p>Are you sure you want to delete this student?</p>
@@ -80,6 +79,7 @@
         </div>
 
         <script src="static/js/student-actions.js"></script>
+
     </body>
 </html>
 

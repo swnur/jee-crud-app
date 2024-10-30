@@ -11,8 +11,8 @@
 <head>
     <title>Update Student</title>
 
-    <link type="text/css" rel="stylesheet" href="static/css/style.css">
-    <link type="text/css" rel="stylesheet" href="static/css/add-student-style.css">
+    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/static/css/style.css">
+    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/static/css/add-student-style.css">
 </head>
 <body>
 <div id="wrapper">
@@ -22,7 +22,7 @@
 </div>
 
 <div id="container">
-    <h3>Add Student</h3>
+    <h3>Update Student</h3>
 
     <form action="student" method="POST">
         <input type="hidden" name="command" value="UPDATE" />
