@@ -52,8 +52,7 @@ public class StudentDBUtil {
             preparedStatement.setString(3, student.getEmail());
             preparedStatement.setString(4, student.getAddress());
 
-            int statementResult = preparedStatement.executeUpdate();
-            return statementResult == 1;
+            return preparedStatement.executeUpdate() == 1;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -103,8 +102,22 @@ public class StudentDBUtil {
             preparedStatement.setInt(5, student.getId());
 
 
-            int result = preparedStatement.executeUpdate();
-            return result == 1;
+            return preparedStatement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteStudent(int studentId) {
+        String sqlQuery = "DELETE FROM student WHERE id=?;";
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+            preparedStatement.setInt(1, studentId);
+
+            return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

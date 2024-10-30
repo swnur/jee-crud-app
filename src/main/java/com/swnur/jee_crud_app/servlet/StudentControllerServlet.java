@@ -19,7 +19,6 @@ import java.util.List;
 @WebServlet("/student")
 public class StudentControllerServlet extends HttpServlet {
     private StudentDBUtil studentDBUtil;
-    private DataSource dataSource;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -27,7 +26,7 @@ public class StudentControllerServlet extends HttpServlet {
 
         try {
             InitialContext initialContext = new InitialContext();
-            dataSource = (DataSource) initialContext.lookup("java:comp/env/jdbc/web_student_tracker");
+            DataSource dataSource = (DataSource) initialContext.lookup("java:comp/env/jdbc/web_student_tracker");
 
             studentDBUtil = new StudentDBUtil(dataSource);
         } catch (NamingException e) {
@@ -50,6 +49,7 @@ public class StudentControllerServlet extends HttpServlet {
                     addStudent(req, resp);
                     break;
                 case "DELETE":
+                    deleteStudent(req, resp);
                     break;
                 case "UPDATE":
                     updateStudent(req, resp);
@@ -97,7 +97,7 @@ public class StudentControllerServlet extends HttpServlet {
         listStudents(request, response);
     }
 
-    private void loadStudent(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void loadStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 1. Read student id from form data
         int studentId = Integer.parseInt(request.getParameter("studentId"));
 
@@ -111,7 +111,7 @@ public class StudentControllerServlet extends HttpServlet {
         requestDispatcher.forward(request, response);
     }
 
-    private void updateStudent(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void updateStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("studentId"));
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
@@ -124,6 +124,15 @@ public class StudentControllerServlet extends HttpServlet {
         boolean result = studentDBUtil.updateStudent(tempStudent);
 
         System.out.println("Update student result -> " + result);
+        listStudents(request, response);
+    }
+
+    private void deleteStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int studentId = Integer.parseInt(request.getParameter("studentId"));
+
+        boolean result = studentDBUtil.deleteStudent(studentId);
+
+        System.out.println("Delete student result -> " + result);
         listStudents(request, response);
     }
 }

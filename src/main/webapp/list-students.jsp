@@ -13,6 +13,7 @@
         <title>Student Tracker App</title>
 
         <link type="text/css" rel="stylesheet" href="static/css/style.css">
+        <link type="text/css" rel="stylesheet" href="static/css/modal.css">
     </head>
     <body>
         <div id="wrapper">
@@ -23,10 +24,6 @@
 
         <div id="container">
             <div id="content">
-
-                <input type="button" value="Add Student"
-                       onclick="window.location.href='add-student-form.jsp'; return false;"
-                       class="add-student-button" />
 
                 <table>
                     <tr>
@@ -45,6 +42,12 @@
                             <c:param name="studentId" value="${student.id}" />
                         </c:url>
 
+                        <!-- set up a link to delete a student -->
+                        <c:url var="deleteLink" value="student">
+                            <c:param name="command" value="DELETE" />
+                            <c:param name="studentId" value="${student.id}" />
+                        </c:url>
+
                         <tr>
                             <td>${student.firstName}</td>
                             <td>${student.lastName}</td>
@@ -52,11 +55,31 @@
                             <td>${student.address}</td>
                             <td>
                                 <a href="${tempLink}">Update</a>
+                                |
+                                <a href="${deleteLink}" class="delete-link"
+                                   onclick="openDeleteModal(event, '${deleteLink}')">
+                                    Delete
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
                 </table>
+
+                <input type="button" value="Add Student"
+                       onclick="window.location.href='add-student-form.jsp'; return false;"
+                       class="add-student-button" />
             </div>
         </div>
+
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <p>Are you sure you want to delete this student?</p>
+                <button onclick="confirmDelete()">Yes, delete</button>
+                <button onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+
+        <script src="static/js/student-actions.js"></script>
     </body>
 </html>
+
