@@ -2,6 +2,8 @@ package com.swnur.jee_crud_app.dao;
 
 import com.swnur.jee_crud_app.exception.DataAccessException;
 import com.swnur.jee_crud_app.model.Student;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentDAOImpl implements StudentDAO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudentDAOImpl.class);
     private final DataSource dataSource;
 
     public StudentDAOImpl(DataSource dataSource) {
@@ -30,7 +33,7 @@ public class StudentDAOImpl implements StudentDAO {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Database error in addStudent() for student: {}", student.getInitials(), e);
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -46,7 +49,7 @@ public class StudentDAOImpl implements StudentDAO {
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Database error in deleteStudent with id: {}", studentId, e);
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -69,10 +72,9 @@ public class StudentDAOImpl implements StudentDAO {
             preparedStatement.setString(4, student.getAddress());
             preparedStatement.setInt(5, student.getId());
 
-
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Database error in updateStudent: {}", student, e);
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -83,22 +85,24 @@ public class StudentDAOImpl implements StudentDAO {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-
             preparedStatement.setInt(1, studentId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            Student student = new Student();
 
-            while (resultSet.next()) {
-                student.setFirstName(resultSet.getString("first_name"));
-                student.setLastName(resultSet.getString("last_name"));
-                student.setEmail(resultSet.getString("email"));
-                student.setAddress(resultSet.getString("address"));
+            if (!resultSet.next()) {
+                LOGGER.warn("No student found with id: {}", studentId);
+                return null;
             }
+
+            Student student = new Student();
+            student.setFirstName(resultSet.getString("first_name"));
+            student.setLastName(resultSet.getString("last_name"));
+            student.setEmail(resultSet.getString("email"));
+            student.setAddress(resultSet.getString("address"));
 
             return student;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Database error getStudent with id {}", studentId, e);
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -113,21 +117,26 @@ public class StudentDAOImpl implements StudentDAO {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sqlQuery)) {
 
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String firstName = resultSet.getString("first_name");
-                String lastName = resultSet.getString("last_name");
-                String email = resultSet.getString("email");
-                String address = resultSet.getString("address");
+            if (!resultSet.next()) {
+                LOGGER.warn("No students found for getAllStudents()");
+            } else {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String firstName = resultSet.getString("first_name");
+                    String lastName = resultSet.getString("last_name");
+                    String email = resultSet.getString("email");
+                    String address = resultSet.getString("address");
 
-                Student student = new Student(id, firstName, lastName, email, address);
-                students.add(student);
+                    Student student = new Student(id, firstName, lastName, email, address);
+                    students.add(student);
+                }
             }
+
+            return students;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Database error in getAllStudents", e);
             throw new DataAccessException(e.getMessage());
         }
 
-        return students;
     }
 }
