@@ -64,6 +64,10 @@ public class Student {
         this.address = address;
     }
 
+    public String getInitials() {
+        return String.format("{id='%d', initials='%s %s'}", id, firstName, lastName);
+    }
+
     @Override
     public String toString() {
         return "Student = [" +
